@@ -1,13 +1,12 @@
 import ApplicativeRouter
-import Deriving
 import Either
 import Prelude
 
-struct SubscribeData: Codable {
+struct SubscribeData: Codable, Equatable {
   let plan: Int
 }
 
-enum Routes {
+enum Routes: Equatable {
   case home
   case root
   case pathComponents(param: Either<String, Int>, commentId: Int)
@@ -61,47 +60,14 @@ let router: Router<Routes> = [
   ]
   .reduce(.empty, <|>)
 
-extension Routes: Equatable {
-  static func ==(lhs: Routes, rhs: Routes) -> Bool {
-    switch (lhs, rhs) {
-    case (.home, .home), (.root, .root):
-      return true
-
-    case let (.pathComponents(lhs0, lhs1), .pathComponents(rhs0, rhs1)):
-      return lhs0 == rhs0 && lhs1 == rhs1
-
-    case let (.postBodyField(lhs), .postBodyField(rhs)):
-      return lhs == rhs
-
-    case let (.postBodyFormData(lhs), .postBodyFormData(rhs)):
-      return lhs.plan == rhs.plan
-
-    case let (.postBodyJsonDecodable(lhs), .postBodyJsonDecodable(rhs)):
-      return lhs == rhs
-
-    case let (.simpleQueryParams(lhs0, lhs1, lhs2), .simpleQueryParams(rhs0, rhs1, rhs2)):
-      return lhs0 == rhs0 && lhs1 == rhs1 && lhs2 == rhs2
-
-    case let (.codableQueryParams(lhs), .codableQueryParams(rhs)):
-      return lhs.plan == rhs.plan
-
-    case let (.redirect(lhs), .redirect(rhs)):
-      return lhs == rhs
-
-    default:
-      return false
-    }
-  }
-}
-
 extension Routes {
   enum iso {
-    static let home = parenthesize <| PartialIso(
+    static let home = parenthesize <| PartialIso<Prelude.Unit, Routes>(
       apply: const(.some(.home)),
       unapply: { $0 == .home ? unit : nil }
     )
 
-    static let root = parenthesize <| PartialIso(
+    static let root = parenthesize <| PartialIso<Prelude.Unit, Routes>(
       apply: const(.some(.root)),
       unapply: { $0 == .root ? unit : nil }
     )
@@ -157,7 +123,7 @@ extension Routes {
   }
 }
 
-struct Episode: Codable, DerivingEquatable {
+struct Episode: Codable, Equatable {
   let title: String
   let blurb: String
   let length: Int

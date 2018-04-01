@@ -88,7 +88,7 @@ func cast<A>(_ x: Key<A>) -> Key<Unit> {
   return .init(x.unKeys)
 }
 
-public struct Value {
+public struct Value: Equatable {
   let unValue: Prefixed
   init(_ unValue: Prefixed) {
     self.unValue = unValue
@@ -98,12 +98,6 @@ public struct Value {
 extension Value: ExpressibleByStringLiteral {
   public init(stringLiteral value: String) {
     self = .init(.plain(value))
-  }
-}
-
-extension Value: Equatable {
-  public static func ==(lhs: Value, rhs: Value) -> Bool {
-    return lhs.unValue == rhs.unValue
   }
 }
 
